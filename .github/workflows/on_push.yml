@@ -1,0 +1,35 @@
+name: "Host BYOND client storage asset"
+
+on:
+  repository_dispatch:
+    types: [on_master_push]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  generate_web_assets:
+    permissions:
+      contents: write
+
+    runs-on: ubuntu-22.04
+    concurrency: create-assets
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          repository: "tgstation/tgstation"
+          ref: "master"
+
+      - name: Generate assets
+        run: |
+          mv tgui/public/ publish
+
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@v4.7.3
+        with:
+          branch: gh-pages
+          clean: true
+          single-commit: true
+          folder: publish
